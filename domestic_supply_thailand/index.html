@@ -118,6 +118,19 @@
     .sector-row.active {
       background-color: #F4F8F9;
     }
+
+    .chart-grid,
+    .chart-threshold,
+    .chart-series,
+    .chart-marker,
+    .chart-marker-dot {
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-series {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
   </style>
 </head>
 <body class="min-h-screen antialiased text-text-main">
@@ -160,19 +173,19 @@
         </header>
 
         <div class="relative mt-2 min-h-[300px] w-full flex-1">
-          <svg id="reserveChart" class="h-full w-full" viewBox="0 0 800 300" preserveAspectRatio="none">
-            <line x1="0" y1="50" x2="800" y2="50" stroke="#F3F4F6" stroke-width="1"></line>
-            <line x1="0" y1="150" x2="800" y2="150" stroke="#F3F4F6" stroke-width="1"></line>
-            <line x1="0" y1="250" x2="800" y2="250" stroke="#F3F4F6" stroke-width="1"></line>
+          <svg id="reserveChart" class="h-full w-full" viewBox="0 0 800 300" preserveAspectRatio="none" shape-rendering="geometricPrecision">
+            <line class="chart-grid" x1="0" y1="50" x2="800" y2="50" stroke="#E7EDF0" stroke-width="0.8"></line>
+            <line class="chart-grid" x1="0" y1="150" x2="800" y2="150" stroke="#E7EDF0" stroke-width="0.8"></line>
+            <line class="chart-grid" x1="0" y1="250" x2="800" y2="250" stroke="#E7EDF0" stroke-width="0.8"></line>
 
-            <line x1="0" y1="200" x2="800" y2="200" stroke="#DC2626" stroke-dasharray="6 4" stroke-width="2"></line>
-            <text x="790" y="190" text-anchor="end" fill="#DC2626" style="font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 500;">90-Day Mandate (30 MMbbl)</text>
+            <line class="chart-threshold" x1="0" y1="200" x2="800" y2="200" stroke="#DC2626" stroke-dasharray="4 3" stroke-width="1.4"></line>
+            <text x="790" y="188" text-anchor="end" fill="#B91C1C" style="font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 500;">90-Day Mandate (30 MMbbl)</text>
 
-            <path id="reserveLinePath" d="" fill="none" stroke="#0E7490" stroke-width="2"></path>
-            <path id="reserveAreaPath" d="" fill="#0E7490" opacity="0.07"></path>
+            <path id="reserveAreaPath" d="" fill="#0E7490" opacity="0.04"></path>
+            <path id="reserveLinePath" class="chart-series" d="" fill="none" stroke="#0E7490" stroke-width="1.6"></path>
 
-            <line id="dayMarker" x1="0" y1="40" x2="0" y2="280" stroke="#0E7490" stroke-width="1.5"></line>
-            <circle id="dayMarkerDot" cx="0" cy="0" r="4" fill="#FFFFFF" stroke="#0E7490" stroke-width="2"></circle>
+            <line id="dayMarker" class="chart-marker" x1="0" y1="40" x2="0" y2="280" stroke="#0E7490" stroke-width="1" stroke-opacity="0.45"></line>
+            <circle id="dayMarkerDot" class="chart-marker-dot" cx="0" cy="0" r="3.4" fill="#FFFFFF" stroke="#0E7490" stroke-width="1.6"></circle>
           </svg>
 
           <div class="mt-2 flex justify-between px-1 text-xs font-medium text-muted">
@@ -339,7 +352,7 @@
         return 280 - normalized * 220;
       }
 
-      function buildStepPath(values) {
+      function buildLinePath(values) {
         if (values.length === 0) {
           return "";
         }
@@ -347,9 +360,7 @@
         let path = "M 0 " + reserveToY(values[0]).toFixed(2);
         for (let i = 1; i < values.length; i += 1) {
           const x = xStep * i;
-          const yPrev = reserveToY(values[i - 1]);
           const yCurr = reserveToY(values[i]);
-          path += " L " + x.toFixed(2) + " " + yPrev.toFixed(2);
           path += " L " + x.toFixed(2) + " " + yCurr.toFixed(2);
         }
         return path;
@@ -359,7 +370,7 @@
         if (values.length === 0) {
           return "";
         }
-        return buildStepPath(values) + " L 800 300 L 0 300 Z";
+        return buildLinePath(values) + " L 800 300 L 0 300 Z";
       }
 
       function updateSectorNumbers() {
@@ -388,7 +399,7 @@
       }
 
       function renderReserveChart() {
-        ui.reserveLinePath.setAttribute("d", buildStepPath(state.reserves));
+        ui.reserveLinePath.setAttribute("d", buildLinePath(state.reserves));
         ui.reserveAreaPath.setAttribute("d", buildAreaPath(state.reserves));
 
         const dayIndex = clamp(state.day - 1, 0, state.reserves.length - 1);
