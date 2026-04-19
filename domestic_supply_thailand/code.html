@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Opti Reserve - Domestic Supply</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&family=Space+Grotesk:wght@500;600;700&display=swap"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0E7490",
+            "background-light": "#F4F8F9",
+            "surface": "#FFFFFF",
+            "text-main": "#111827",
+            "muted": "#6B7280",
+            "border-color": "#E5E7EB",
+            "accent-success": "#059669",
+            "accent-danger": "#DC2626"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"],
+            "body": ["IBM Plex Sans", "sans-serif"],
+            "mono": ["IBM Plex Mono", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "2px",
+            "sm": "2px",
+            "md": "2px",
+            "lg": "2px",
+            "full": "9999px"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: radial-gradient(circle at 8% 0%, rgba(14, 116, 144, 0.09), transparent 34%), radial-gradient(circle at 88% 14%, rgba(14, 116, 144, 0.06), transparent 36%), #F4F8F9;
+      color: #111827;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .page-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 16px 36px;
+    }
+
+    @media (min-width: 768px) {
+      .page-shell {
+        padding: 28px 40px 40px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .page-shell {
+        padding: 32px 64px 44px;
+      }
+    }
+
+    .panel {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .top-nav-link {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 2px;
+      border-bottom: 2px solid transparent;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .top-nav-link:hover {
+      color: #0E7490;
+    }
+
+    .top-nav-link.active {
+      color: #0E7490;
+      border-bottom-color: #0E7490;
+    }
+
+    .sector-segment,
+    .sector-row {
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .sector-segment.active {
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.9);
+      transform: scale(1.01);
+    }
+
+    .sector-row.active {
+      background-color: #F4F8F9;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased text-text-main">
+  <header class="border-b border-border-color bg-white/90 backdrop-blur-sm">
+    <div class="mx-auto flex w-full max-w-[1440px] flex-col px-4 md:px-10 lg:px-16">
+      <div class="flex h-[76px] items-center justify-between gap-6">
+        <div class="flex items-center gap-3 text-text-main">
+          <div class="size-5 text-primary">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <h1 class="font-display text-lg font-bold tracking-tight">Opti Reserve</h1>
+        </div>
+        <nav class="hidden items-center gap-7 md:flex">
+          <a class="top-nav-link" href="../executive_overview/code.html">Executive Overview</a>
+          <a class="top-nav-link" href="../global_price_analytics/code.html">Global Analytics</a>
+          <a class="top-nav-link active" href="code.html">Domestic Supply</a>
+          <a class="top-nav-link" href="../monte_carlo_simulator/code.html">Simulator</a>
+        </nav>
+      </div>
+      <nav class="flex items-center gap-5 overflow-x-auto pb-3 md:hidden">
+        <a class="top-nav-link" href="../executive_overview/code.html">Executive</a>
+        <a class="top-nav-link" href="../global_price_analytics/code.html">Global</a>
+        <a class="top-nav-link active" href="code.html">Domestic</a>
+        <a class="top-nav-link" href="../monte_carlo_simulator/code.html">Simulator</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
+      <section class="panel flex flex-col gap-6 p-6 lg:col-span-3">
+        <header class="flex flex-col gap-1">
+          <h2 class="font-display text-base font-medium text-text-main">Real-Time Burn Rate and Replenishment</h2>
+          <div class="flex flex-wrap items-baseline gap-3">
+            <span class="font-display text-[32px] font-bold leading-tight">Current Reserve: <span id="currentReserveValue">45.0</span> MMbbl</span>
+            <span id="reserveDeltaBadge" class="rounded-sm bg-red-50 px-2 py-0.5 text-sm font-medium text-accent-danger">-2.5% 30d</span>
+          </div>
+        </header>
+
+        <div class="relative mt-2 min-h-[300px] w-full flex-1">
+          <svg id="reserveChart" class="h-full w-full" viewBox="0 0 800 300" preserveAspectRatio="none">
+            <line x1="0" y1="50" x2="800" y2="50" stroke="#F3F4F6" stroke-width="1"></line>
+            <line x1="0" y1="150" x2="800" y2="150" stroke="#F3F4F6" stroke-width="1"></line>
+            <line x1="0" y1="250" x2="800" y2="250" stroke="#F3F4F6" stroke-width="1"></line>
+
+            <line x1="0" y1="200" x2="800" y2="200" stroke="#DC2626" stroke-dasharray="6 4" stroke-width="2"></line>
+            <text x="790" y="190" text-anchor="end" fill="#DC2626" style="font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 500;">90-Day Mandate (30 MMbbl)</text>
+
+            <path id="reserveLinePath" d="" fill="none" stroke="#0E7490" stroke-width="2"></path>
+            <path id="reserveAreaPath" d="" fill="#0E7490" opacity="0.07"></path>
+
+            <line id="dayMarker" x1="0" y1="40" x2="0" y2="280" stroke="#0E7490" stroke-width="1.5"></line>
+            <circle id="dayMarkerDot" cx="0" cy="0" r="4" fill="#FFFFFF" stroke="#0E7490" stroke-width="2"></circle>
+          </svg>
+
+          <div class="mt-2 flex justify-between px-1 text-xs font-medium text-muted">
+            <span>Day 1</span>
+            <span>Day 5</span>
+            <span>Day 10</span>
+            <span>Day 15</span>
+            <span>Day 20</span>
+            <span>Day 25</span>
+            <span>Day 30</span>
+          </div>
+
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center justify-between text-xs text-muted">
+              <span id="scrubDayLabel" class="font-mono">Day 15</span>
+              <span id="scrubReserveLabel" class="font-mono">Projected Reserve: 41.6 MMbbl</span>
+            </div>
+            <input id="dayScrubber" type="range" min="1" max="30" value="15" class="w-full accent-primary"/>
+          </div>
+
+          <div class="mt-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <label for="burnRateInput" class="text-xs font-medium uppercase tracking-wider text-muted">Scenario Burn Rate</label>
+            <div class="flex items-center gap-2">
+              <input id="burnRateInput" type="range" min="0.8" max="1.8" step="0.05" value="1.2" class="w-36 accent-primary"/>
+              <span id="burnRateValue" class="font-mono text-sm">1.20 MMbbl/day</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel flex flex-col gap-6 p-6 lg:col-span-2">
+        <header class="flex flex-col gap-1">
+          <h2 class="font-display text-base font-medium text-text-main">Consumption by Sector</h2>
+          <div class="flex flex-wrap items-baseline gap-3">
+            <span class="font-display text-[32px] font-bold leading-tight" id="totalBurnDisplay">1.20 MMbbl/day</span>
+            <span class="rounded-sm bg-green-50 px-2 py-0.5 text-sm font-medium text-accent-success" id="burnTrendBadge">+0.8% avg</span>
+          </div>
+        </header>
+
+        <div class="mt-2 flex flex-1 flex-col justify-center gap-6">
+          <div class="mx-auto flex h-[240px] w-24 flex-col overflow-hidden rounded border border-slate-100 shadow-sm">
+            <div id="segmentTransport" data-sector="transport" class="sector-segment active relative flex w-full items-center justify-center bg-primary" style="height: 50%;">
+              <div class="absolute inset-0 bg-white opacity-0 transition-opacity hover:opacity-10"></div>
+            </div>
+            <div id="segmentIndustry" data-sector="industry" class="sector-segment relative flex w-full items-center justify-center bg-slate-300" style="height: 30%;">
+              <div class="absolute inset-0 bg-primary opacity-0 transition-opacity hover:opacity-20"></div>
+            </div>
+            <div id="segmentPower" data-sector="power" class="sector-segment relative flex w-full items-center justify-center bg-slate-800" style="height: 20%;">
+              <div class="absolute inset-0 bg-primary opacity-0 transition-opacity hover:opacity-30"></div>
+            </div>
+          </div>
+
+          <div class="mt-2 flex flex-col gap-1">
+            <div id="rowTransport" data-sector="transport" class="sector-row active flex items-center justify-between rounded px-2 py-2 text-sm">
+              <div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-sm bg-primary"></span>
+                <span class="font-medium text-slate-700">Transport</span>
+              </div>
+              <span id="valueTransport" class="font-mono">0.60 MMbbl</span>
+            </div>
+            <div id="rowIndustry" data-sector="industry" class="sector-row flex items-center justify-between rounded px-2 py-2 text-sm">
+              <div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-sm bg-slate-300"></span>
+                <span class="font-medium text-slate-700">Industry</span>
+              </div>
+              <span id="valueIndustry" class="font-mono">0.36 MMbbl</span>
+            </div>
+            <div id="rowPower" data-sector="power" class="sector-row flex items-center justify-between rounded px-2 py-2 text-sm">
+              <div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-sm bg-slate-800"></span>
+                <span class="font-medium text-slate-700">Power</span>
+              </div>
+              <span id="valuePower" class="font-mono">0.24 MMbbl</span>
+            </div>
+          </div>
+
+          <div id="sectorInsight" class="rounded-sm border border-border-color bg-background-light p-3 text-xs text-muted">
+            Transport currently represents 50% of daily drawdown and remains the primary optimization target.
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const sectorShares = {
+        transport: 0.5,
+        industry: 0.3,
+        power: 0.2
+      };
+
+      const sectorNames = {
+        transport: "Transport",
+        industry: "Industry",
+        power: "Power"
+      };
+
+      const sectorInsightText = {
+        transport: "Transport currently represents the largest share of consumption. Reducing logistics demand has the biggest effect on reserve longevity.",
+        industry: "Industry load is mid-band and responsive to scheduling. Strategic batching can flatten burn spikes during volatile weeks.",
+        power: "Power demand is the smallest component but can surge quickly. Keep peaker fuel contingencies staged for weather events."
+      };
+
+      const ui = {
+        currentReserveValue: document.getElementById("currentReserveValue"),
+        reserveDeltaBadge: document.getElementById("reserveDeltaBadge"),
+        reserveLinePath: document.getElementById("reserveLinePath"),
+        reserveAreaPath: document.getElementById("reserveAreaPath"),
+        dayMarker: document.getElementById("dayMarker"),
+        dayMarkerDot: document.getElementById("dayMarkerDot"),
+        dayScrubber: document.getElementById("dayScrubber"),
+        scrubDayLabel: document.getElementById("scrubDayLabel"),
+        scrubReserveLabel: document.getElementById("scrubReserveLabel"),
+        burnRateInput: document.getElementById("burnRateInput"),
+        burnRateValue: document.getElementById("burnRateValue"),
+        totalBurnDisplay: document.getElementById("totalBurnDisplay"),
+        burnTrendBadge: document.getElementById("burnTrendBadge"),
+        valueTransport: document.getElementById("valueTransport"),
+        valueIndustry: document.getElementById("valueIndustry"),
+        valuePower: document.getElementById("valuePower"),
+        sectorInsight: document.getElementById("sectorInsight"),
+        segments: Array.from(document.querySelectorAll(".sector-segment")),
+        rows: Array.from(document.querySelectorAll(".sector-row"))
+      };
+
+      const state = {
+        burnRate: 1.2,
+        day: 15,
+        selectedSector: "transport",
+        reserves: []
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function buildReserveSeries(burnRate) {
+        const series = [];
+        let reserve = 45;
+        for (let day = 1; day <= 30; day += 1) {
+          const netBurn = burnRate * 0.23;
+          let replenishment = 0;
+          if (day === 11) {
+            replenishment += 0.95;
+          }
+          if (day === 19) {
+            replenishment += 1.1;
+          }
+          if (day === 25) {
+            replenishment += 0.75;
+          }
+          const noise = Math.sin(day / 5) * 0.04;
+          reserve += replenishment - netBurn + noise;
+          series.push(Number(reserve.toFixed(2)));
+        }
+        return series;
+      }
+
+      function reserveToY(reserveValue) {
+        const minReserve = 26;
+        const maxReserve = 46;
+        const normalized = (reserveValue - minReserve) / (maxReserve - minReserve);
+        return 280 - normalized * 220;
+      }
+
+      function buildStepPath(values) {
+        if (values.length === 0) {
+          return "";
+        }
+        const xStep = 800 / (values.length - 1);
+        let path = "M 0 " + reserveToY(values[0]).toFixed(2);
+        for (let i = 1; i < values.length; i += 1) {
+          const x = xStep * i;
+          const yPrev = reserveToY(values[i - 1]);
+          const yCurr = reserveToY(values[i]);
+          path += " L " + x.toFixed(2) + " " + yPrev.toFixed(2);
+          path += " L " + x.toFixed(2) + " " + yCurr.toFixed(2);
+        }
+        return path;
+      }
+
+      function buildAreaPath(values) {
+        if (values.length === 0) {
+          return "";
+        }
+        return buildStepPath(values) + " L 800 300 L 0 300 Z";
+      }
+
+      function updateSectorNumbers() {
+        ui.totalBurnDisplay.textContent = state.burnRate.toFixed(2) + " MMbbl/day";
+        ui.valueTransport.textContent = (state.burnRate * sectorShares.transport).toFixed(2) + " MMbbl";
+        ui.valueIndustry.textContent = (state.burnRate * sectorShares.industry).toFixed(2) + " MMbbl";
+        ui.valuePower.textContent = (state.burnRate * sectorShares.power).toFixed(2) + " MMbbl";
+
+        const trend = ((state.burnRate - 1.2) / 1.2) * 100;
+        const trendPrefix = trend >= 0 ? "+" : "";
+        ui.burnTrendBadge.textContent = trendPrefix + trend.toFixed(1) + "% avg";
+        ui.burnTrendBadge.classList.toggle("bg-green-50", trend <= 0);
+        ui.burnTrendBadge.classList.toggle("text-accent-success", trend <= 0);
+        ui.burnTrendBadge.classList.toggle("bg-red-50", trend > 0);
+        ui.burnTrendBadge.classList.toggle("text-accent-danger", trend > 0);
+      }
+
+      function updateSectorSelection() {
+        ui.segments.forEach(function (segment) {
+          segment.classList.toggle("active", segment.dataset.sector === state.selectedSector);
+        });
+        ui.rows.forEach(function (row) {
+          row.classList.toggle("active", row.dataset.sector === state.selectedSector);
+        });
+        ui.sectorInsight.textContent = sectorInsightText[state.selectedSector];
+      }
+
+      function renderReserveChart() {
+        ui.reserveLinePath.setAttribute("d", buildStepPath(state.reserves));
+        ui.reserveAreaPath.setAttribute("d", buildAreaPath(state.reserves));
+
+        const dayIndex = clamp(state.day - 1, 0, state.reserves.length - 1);
+        const x = (dayIndex / Math.max(state.reserves.length - 1, 1)) * 800;
+        const reserveValue = state.reserves[dayIndex];
+        const y = reserveToY(reserveValue);
+
+        ui.dayMarker.setAttribute("x1", x.toFixed(2));
+        ui.dayMarker.setAttribute("x2", x.toFixed(2));
+        ui.dayMarkerDot.setAttribute("cx", x.toFixed(2));
+        ui.dayMarkerDot.setAttribute("cy", y.toFixed(2));
+
+        ui.currentReserveValue.textContent = reserveValue.toFixed(1);
+        ui.scrubDayLabel.textContent = "Day " + state.day;
+        ui.scrubReserveLabel.textContent = "Projected Reserve: " + reserveValue.toFixed(1) + " MMbbl";
+
+        const delta = ((reserveValue - state.reserves[0]) / state.reserves[0]) * 100;
+        const deltaPrefix = delta >= 0 ? "+" : "";
+        ui.reserveDeltaBadge.textContent = deltaPrefix + delta.toFixed(1) + "% 30d";
+        ui.reserveDeltaBadge.classList.toggle("bg-green-50", delta >= 0);
+        ui.reserveDeltaBadge.classList.toggle("text-accent-success", delta >= 0);
+        ui.reserveDeltaBadge.classList.toggle("bg-red-50", delta < 0);
+        ui.reserveDeltaBadge.classList.toggle("text-accent-danger", delta < 0);
+      }
+
+      function rebuildScenario() {
+        state.reserves = buildReserveSeries(state.burnRate);
+        updateSectorNumbers();
+        renderReserveChart();
+      }
+
+      function setSelectedSector(sectorKey) {
+        state.selectedSector = sectorKey;
+        updateSectorSelection();
+      }
+
+      ui.dayScrubber.addEventListener("input", function () {
+        state.day = Number(ui.dayScrubber.value);
+        renderReserveChart();
+      });
+
+      ui.burnRateInput.addEventListener("input", function () {
+        state.burnRate = Number(ui.burnRateInput.value);
+        ui.burnRateValue.textContent = state.burnRate.toFixed(2) + " MMbbl/day";
+        rebuildScenario();
+      });
+
+      ui.segments.forEach(function (segment) {
+        segment.addEventListener("click", function () {
+          setSelectedSector(segment.dataset.sector);
+        });
+      });
+
+      ui.rows.forEach(function (row) {
+        row.addEventListener("click", function () {
+          setSelectedSector(row.dataset.sector);
+        });
+      });
+
+      document.getElementById("reserveChart").addEventListener("click", function (event) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const xRatio = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+        const day = Math.round(xRatio * 29) + 1;
+        state.day = day;
+        ui.dayScrubber.value = String(day);
+        renderReserveChart();
+      });
+
+      rebuildScenario();
+      updateSectorSelection();
+      ui.burnRateValue.textContent = state.burnRate.toFixed(2) + " MMbbl/day";
+      ui.dayScrubber.value = String(state.day);
+    })();
+  </script>
+</body>
+</html>

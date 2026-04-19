@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Opti Reserve - Executive Overview</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&family=Space+Grotesk:wght@500;600;700&display=swap"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0E7490",
+            "background-light": "#F4F8F9",
+            "surface": "#FFFFFF",
+            "text-main": "#111827",
+            "muted": "#6B7280",
+            "border-color": "#E5E7EB",
+            "accent-success": "#059669",
+            "accent-danger": "#DC2626"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"],
+            "body": ["IBM Plex Sans", "sans-serif"],
+            "mono": ["IBM Plex Mono", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "2px",
+            "sm": "2px",
+            "md": "2px",
+            "lg": "2px",
+            "full": "9999px"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: radial-gradient(circle at 8% 0%, rgba(14, 116, 144, 0.09), transparent 34%), radial-gradient(circle at 88% 14%, rgba(14, 116, 144, 0.06), transparent 36%), #F4F8F9;
+      color: #111827;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .page-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 16px 36px;
+    }
+
+    @media (min-width: 768px) {
+      .page-shell {
+        padding: 28px 40px 40px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .page-shell {
+        padding: 32px 64px 44px;
+      }
+    }
+
+    .panel {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .top-nav-link {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 2px;
+      border-bottom: 2px solid transparent;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .top-nav-link:hover {
+      color: #0E7490;
+    }
+
+    .top-nav-link.active {
+      color: #0E7490;
+      border-bottom-color: #0E7490;
+    }
+
+    .card-selectable {
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-selectable:hover {
+      border-color: #0E7490;
+    }
+
+    .card-selectable.is-selected {
+      border-color: #0E7490;
+      box-shadow: 0 0 0 1px rgba(14, 116, 144, 0.25), 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .sparkline {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(to right, rgba(14, 116, 144, 0.1), rgba(14, 116, 144, 0.28));
+      border-bottom: 2px solid #0E7490;
+      position: relative;
+      clip-path: polygon(0 100%, 0 80%, 20% 70%, 40% 90%, 60% 40%, 80% 60%, 100% 20%, 100% 100%);
+    }
+
+    .sparkline-down {
+      border-bottom-color: #DC2626;
+      background: linear-gradient(to right, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.28));
+      clip-path: polygon(0 100%, 0 20%, 20% 40%, 40% 30%, 60% 70%, 80% 60%, 100% 90%, 100% 100%);
+    }
+
+    .sparkline-hover:hover::after {
+      content: "Date: 2026-04-18\A Value: 74.50";
+      position: absolute;
+      top: -34px;
+      right: 10px;
+      background: #111827;
+      color: #FFFFFF;
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-size: 11px;
+      white-space: pre;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased text-text-main">
+  <header class="border-b border-border-color bg-white/90 backdrop-blur-sm">
+    <div class="mx-auto flex w-full max-w-[1440px] flex-col px-4 md:px-10 lg:px-16">
+      <div class="flex h-[76px] items-center justify-between gap-6">
+        <div class="flex items-center gap-3 text-text-main">
+          <div class="size-5 text-primary">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <h1 class="font-display text-lg font-bold tracking-tight">Opti Reserve</h1>
+        </div>
+        <nav class="hidden items-center gap-7 md:flex">
+          <a class="top-nav-link active" href="code.html">Executive Overview</a>
+          <a class="top-nav-link" href="../global_price_analytics/code.html">Global Analytics</a>
+          <a class="top-nav-link" href="../domestic_supply_thailand/code.html">Domestic Supply</a>
+          <a class="top-nav-link" href="../monte_carlo_simulator/code.html">Simulator</a>
+        </nav>
+      </div>
+      <nav class="flex items-center gap-5 overflow-x-auto pb-3 md:hidden">
+        <a class="top-nav-link active" href="code.html">Executive</a>
+        <a class="top-nav-link" href="../global_price_analytics/code.html">Global</a>
+        <a class="top-nav-link" href="../domestic_supply_thailand/code.html">Domestic</a>
+        <a class="top-nav-link" href="../monte_carlo_simulator/code.html">Simulator</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell flex flex-col gap-6">
+    <section class="panel p-6 md:p-7">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-3">
+            <span id="actionIcon" class="material-symbols-outlined text-[26px] text-accent-success">check_circle</span>
+            <h2 id="actionHeadline" class="font-display text-2xl font-bold uppercase tracking-wide">Action: Hold</h2>
+          </div>
+          <p id="actionSummary" class="ml-10 text-sm text-muted">Based on 10,000 overnight Monte Carlo simulations. Current reserves remain sufficient for projected 90-day volatility.</p>
+        </div>
+        <button id="runCustomSimulationButton" class="inline-flex h-10 min-w-[190px] items-center justify-center gap-2 rounded-sm bg-primary px-6 text-[13px] font-medium uppercase tracking-[0.05em] text-white transition-colors hover:bg-[#0A5E74]">
+          <span>Run Custom Simulation</span>
+          <span class="material-symbols-outlined text-base">play_arrow</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <article data-card="reserves" class="card-selectable is-selected panel p-6">
+        <div class="mb-4 flex items-start justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-muted">Current Thai Reserves</h3>
+          <span class="material-symbols-outlined text-muted">oil_barrel</span>
+        </div>
+        <div class="mb-6 flex items-baseline gap-2">
+          <span class="font-mono text-[32px] font-bold leading-none tracking-tight">45.2</span>
+          <span class="text-sm font-medium text-muted">MMbbl</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="font-medium text-text-main">37 Days Remaining</span>
+          <span class="font-medium text-accent-danger">90-Day Mandate</span>
+        </div>
+        <div class="relative mt-2 h-2 overflow-hidden rounded-sm bg-border-color">
+          <div class="absolute left-0 top-0 h-full bg-primary" style="width: 41%;"></div>
+          <div class="absolute bottom-0 right-[60%] top-0 w-px bg-accent-danger"></div>
+        </div>
+        <p class="mt-2 text-right text-xs text-muted">Based on 1.2 MMbbl/day burn rate</p>
+      </article>
+
+      <article data-card="burn" class="card-selectable panel p-6">
+        <div class="mb-4 flex items-start justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-muted">Daily Burn Rate</h3>
+          <span class="material-symbols-outlined text-muted">local_fire_department</span>
+        </div>
+        <div class="mb-4 flex items-baseline gap-2">
+          <span class="font-mono text-[32px] font-bold leading-none tracking-tight">1.2</span>
+          <span class="text-sm font-medium text-muted">MMbbl/day</span>
+        </div>
+        <div class="sparkline-hover mt-auto cursor-crosshair">
+          <div class="mb-1 flex justify-between text-[10px] text-muted">
+            <span>7 Days Ago</span>
+            <span>Today</span>
+          </div>
+          <div class="sparkline"></div>
+        </div>
+      </article>
+
+      <article data-card="ev" class="card-selectable panel p-6">
+        <div class="mb-4 flex items-start justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-muted">30-Day EV Cost</h3>
+          <span class="material-symbols-outlined text-muted">payments</span>
+        </div>
+        <div class="mb-4 flex items-baseline gap-2">
+          <span class="font-mono text-2xl text-muted">$</span>
+          <span class="font-mono text-[32px] font-bold leading-none tracking-tight">74.50</span>
+          <span class="text-sm font-medium text-muted">/bbl</span>
+        </div>
+        <div class="sparkline-hover mt-auto cursor-crosshair">
+          <div class="mb-1 flex justify-between text-[10px] text-muted">
+            <span>Forecast Start</span>
+            <span>+30 Days</span>
+          </div>
+          <div class="sparkline" style="clip-path: polygon(0 100%, 0 90%, 20% 80%, 40% 85%, 60% 60%, 80% 40%, 100% 10%, 100% 100%); border-bottom-color: #059669; background: linear-gradient(to right, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.3));"></div>
+        </div>
+      </article>
+
+      <article data-card="vix" class="card-selectable panel p-6">
+        <div class="mb-4 flex items-start justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-muted">Global Volatility (VIX)</h3>
+          <span class="material-symbols-outlined text-muted">show_chart</span>
+        </div>
+        <div class="mb-4 flex items-baseline gap-2">
+          <span class="font-mono text-[32px] font-bold leading-none tracking-tight">18.4</span>
+          <span class="inline-flex items-center text-xs font-medium text-accent-success"><span class="material-symbols-outlined text-sm">arrow_downward</span>2.1%</span>
+        </div>
+        <div class="sparkline-hover mt-auto cursor-crosshair">
+          <div class="mb-1 flex justify-between text-[10px] text-muted">
+            <span>T-30</span>
+            <span>Current</span>
+          </div>
+          <div class="sparkline sparkline-down"></div>
+        </div>
+      </article>
+
+      <article data-card="doeb" id="doebCard" class="card-selectable panel relative overflow-hidden border-accent-danger p-6">
+        <div class="absolute left-0 top-0 h-1 w-full bg-accent-danger"></div>
+        <div class="mb-4 flex items-start justify-between">
+          <h3 class="text-sm font-medium uppercase tracking-wider text-muted">DOEB Replenishment</h3>
+          <span id="doebIcon" class="material-symbols-outlined text-accent-danger">error</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p id="doebStatus" class="text-sm font-medium text-accent-danger">Data feed disrupted.</p>
+          <p id="doebSubtext" class="text-xs text-muted">Check DOEB API connection status in settings. Last successful sync 4 hours ago.</p>
+        </div>
+        <button id="retryDoebButton" class="mt-5 inline-flex h-8 items-center rounded-sm border border-border-color px-3 text-xs font-medium text-text-main transition-colors hover:bg-background-light">Retry Connection</button>
+      </article>
+
+      <article data-card="owid" id="owidCard" class="card-selectable panel flex flex-col items-center justify-center border-2 border-dashed border-border-color bg-transparent p-6 text-center opacity-70">
+        <div class="flex flex-col items-center gap-3">
+          <span id="owidIcon" class="material-symbols-outlined text-3xl text-muted">sync</span>
+          <h3 id="owidTitle" class="text-sm font-medium text-text-main">Awaiting OWID Data Stream</h3>
+          <p id="owidBody" class="px-4 text-xs text-muted">Integration pending for historical probability matrix.</p>
+          <button id="connectOwidButton" class="inline-flex h-8 items-center rounded-sm border border-border-color px-3 text-xs font-medium text-text-main transition-colors hover:bg-white">Activate Stream</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const scenarios = {
+        reserves: {
+          action: "Action: Buy",
+          icon: "warning",
+          iconColor: "text-accent-danger",
+          summary: "Reserve cover is beneath the 90-day mandate. Run a replenishment simulation with elevated demand assumptions.",
+          params: { volatility: 19.8, demand: 6.4, risk: 13.4 }
+        },
+        burn: {
+          action: "Action: Hold",
+          icon: "check_circle",
+          iconColor: "text-accent-success",
+          summary: "Burn profile is stable. Maintain current buying cadence and monitor transport demand drift.",
+          params: { volatility: 16.2, demand: 2.1, risk: 9.8 }
+        },
+        ev: {
+          action: "Action: Buy",
+          icon: "trending_up",
+          iconColor: "text-accent-danger",
+          summary: "Expected value is climbing across near-term runs. Lock in strategic volume before risk premium expands.",
+          params: { volatility: 21.7, demand: 4.7, risk: 15.6 }
+        },
+        vix: {
+          action: "Action: Hold",
+          icon: "check_circle",
+          iconColor: "text-accent-success",
+          summary: "Volatility remains contained. Hold policy is favored while downside risk stays compressed.",
+          params: { volatility: 14.9, demand: 1.8, risk: 8.7 }
+        },
+        doeb: {
+          action: "Action: Hedge",
+          icon: "warning",
+          iconColor: "text-accent-danger",
+          summary: "Replenishment feed interruption increases uncertainty. Add protective volume until pipeline visibility returns.",
+          params: { volatility: 24.4, demand: 5.2, risk: 17.1 }
+        },
+        owid: {
+          action: "Action: Hold",
+          icon: "check_circle",
+          iconColor: "text-accent-success",
+          summary: "Historical stream not yet active. Interim strategy remains hold while long-horizon calibration is pending.",
+          params: { volatility: 18.4, demand: 3.9, risk: 11.6 }
+        }
+      };
+
+      const ui = {
+        cards: Array.from(document.querySelectorAll("[data-card]")),
+        actionIcon: document.getElementById("actionIcon"),
+        actionHeadline: document.getElementById("actionHeadline"),
+        actionSummary: document.getElementById("actionSummary"),
+        runCustomSimulationButton: document.getElementById("runCustomSimulationButton"),
+        retryDoebButton: document.getElementById("retryDoebButton"),
+        doebCard: document.getElementById("doebCard"),
+        doebIcon: document.getElementById("doebIcon"),
+        doebStatus: document.getElementById("doebStatus"),
+        doebSubtext: document.getElementById("doebSubtext"),
+        connectOwidButton: document.getElementById("connectOwidButton"),
+        owidCard: document.getElementById("owidCard"),
+        owidIcon: document.getElementById("owidIcon"),
+        owidTitle: document.getElementById("owidTitle"),
+        owidBody: document.getElementById("owidBody")
+      };
+
+      const state = {
+        selectedCard: "reserves"
+      };
+
+      function applyScenario(cardKey) {
+        state.selectedCard = cardKey;
+        const scenario = scenarios[cardKey];
+
+        ui.actionHeadline.textContent = scenario.action;
+        ui.actionSummary.textContent = scenario.summary;
+        ui.actionIcon.textContent = scenario.icon;
+        ui.actionIcon.className = "material-symbols-outlined text-[26px] " + scenario.iconColor;
+
+        ui.cards.forEach(function (card) {
+          card.classList.toggle("is-selected", card.dataset.card === cardKey);
+        });
+      }
+
+      function openSimulationWithScenario() {
+        const scenario = scenarios[state.selectedCard];
+        const params = new URLSearchParams({
+          volatility: String(scenario.params.volatility),
+          demand: String(scenario.params.demand),
+          risk: String(scenario.params.risk)
+        });
+        window.location.href = "../monte_carlo_simulator/code.html?" + params.toString();
+      }
+
+      ui.cards.forEach(function (card) {
+        card.addEventListener("click", function () {
+          applyScenario(card.dataset.card);
+        });
+      });
+
+      ui.runCustomSimulationButton.addEventListener("click", openSimulationWithScenario);
+
+      ui.retryDoebButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        ui.retryDoebButton.disabled = true;
+        ui.retryDoebButton.textContent = "Reconnecting...";
+
+        setTimeout(function () {
+          ui.doebCard.classList.remove("border-accent-danger");
+          ui.doebCard.classList.add("border-accent-success");
+          ui.doebIcon.textContent = "check_circle";
+          ui.doebIcon.className = "material-symbols-outlined text-accent-success";
+          ui.doebStatus.textContent = "Data feed restored.";
+          ui.doebStatus.className = "text-sm font-medium text-accent-success";
+          ui.doebSubtext.textContent = "Live sync resumed. Last successful pull 10 seconds ago.";
+          ui.retryDoebButton.textContent = "Connected";
+          scenarios.doeb = {
+            action: "Action: Hold",
+            icon: "check_circle",
+            iconColor: "text-accent-success",
+            summary: "Replenishment pipeline is healthy. Risk premium has normalized and hedging pressure is reduced.",
+            params: { volatility: 16.3, demand: 3.4, risk: 8.4 }
+          };
+
+          if (state.selectedCard === "doeb") {
+            applyScenario("doeb");
+          }
+        }, 900);
+      });
+
+      ui.connectOwidButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        ui.connectOwidButton.disabled = true;
+        ui.connectOwidButton.textContent = "Activating...";
+
+        setTimeout(function () {
+          ui.owidCard.classList.remove("opacity-70", "bg-transparent");
+          ui.owidCard.classList.add("bg-white");
+          ui.owidIcon.textContent = "check_circle";
+          ui.owidIcon.className = "material-symbols-outlined text-3xl text-accent-success";
+          ui.owidTitle.textContent = "OWID Data Stream Active";
+          ui.owidBody.textContent = "Historical probability matrix is now integrated and contributing to recommendation confidence.";
+          ui.connectOwidButton.textContent = "Connected";
+          scenarios.owid = {
+            action: "Action: Hold",
+            icon: "check_circle",
+            iconColor: "text-accent-success",
+            summary: "Historical calibration is online. Current recommendation remains hold with improved confidence bounds.",
+            params: { volatility: 17.2, demand: 2.9, risk: 9.7 }
+          };
+
+          if (state.selectedCard === "owid") {
+            applyScenario("owid");
+          }
+        }, 800);
+      });
+
+      applyScenario(state.selectedCard);
+    })();
+  </script>
+</body>
+</html>

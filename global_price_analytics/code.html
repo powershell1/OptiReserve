@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Opti Reserve - Global Price Analytics</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&family=Space+Grotesk:wght@500;600;700&display=swap"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0E7490",
+            "background-light": "#F4F8F9",
+            "surface": "#FFFFFF",
+            "text-main": "#111827",
+            "muted": "#6B7280",
+            "border-color": "#E5E7EB",
+            "accent-success": "#059669",
+            "accent-danger": "#DC2626"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"],
+            "body": ["IBM Plex Sans", "sans-serif"],
+            "mono": ["IBM Plex Mono", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "2px",
+            "sm": "2px",
+            "md": "2px",
+            "lg": "2px",
+            "full": "9999px"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: radial-gradient(circle at 8% 0%, rgba(14, 116, 144, 0.09), transparent 34%), radial-gradient(circle at 88% 14%, rgba(14, 116, 144, 0.06), transparent 36%), #F4F8F9;
+      color: #111827;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .page-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 16px 36px;
+    }
+
+    @media (min-width: 768px) {
+      .page-shell {
+        padding: 28px 40px 40px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .page-shell {
+        padding: 32px 64px 44px;
+      }
+    }
+
+    .panel {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .top-nav-link {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 2px;
+      border-bottom: 2px solid transparent;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .top-nav-link:hover {
+      color: #0E7490;
+    }
+
+    .top-nav-link.active {
+      color: #0E7490;
+      border-bottom-color: #0E7490;
+    }
+
+    .range-button {
+      border-radius: 2px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      color: #6B7280;
+      transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .range-button:hover {
+      color: #111827;
+    }
+
+    .range-button.active {
+      background: #FFFFFF;
+      color: #0E7490;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased text-text-main">
+  <header class="border-b border-border-color bg-white/90 backdrop-blur-sm">
+    <div class="mx-auto flex w-full max-w-[1440px] flex-col px-4 md:px-10 lg:px-16">
+      <div class="flex h-[76px] items-center justify-between gap-6">
+        <div class="flex items-center gap-3 text-text-main">
+          <div class="size-5 text-primary">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <h1 class="font-display text-lg font-bold tracking-tight">Opti Reserve</h1>
+        </div>
+        <nav class="hidden items-center gap-7 md:flex">
+          <a class="top-nav-link" href="../executive_overview/code.html">Executive Overview</a>
+          <a class="top-nav-link active" href="code.html">Global Analytics</a>
+          <a class="top-nav-link" href="../domestic_supply_thailand/code.html">Domestic Supply</a>
+          <a class="top-nav-link" href="../monte_carlo_simulator/code.html">Simulator</a>
+        </nav>
+      </div>
+      <nav class="flex items-center gap-5 overflow-x-auto pb-3 md:hidden">
+        <a class="top-nav-link" href="../executive_overview/code.html">Executive</a>
+        <a class="top-nav-link active" href="code.html">Global</a>
+        <a class="top-nav-link" href="../domestic_supply_thailand/code.html">Domestic</a>
+        <a class="top-nav-link" href="../monte_carlo_simulator/code.html">Simulator</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell grid grid-cols-1 gap-4 lg:grid-cols-12">
+    <aside class="panel p-6 lg:col-span-3">
+      <h2 class="font-display text-xl font-bold tracking-tight text-text-main">Data Streams</h2>
+      <div class="mt-5 flex flex-col gap-2">
+        <label class="-mx-2 flex cursor-pointer items-center gap-3 rounded px-2 py-3 transition-colors hover:bg-background-light">
+          <input id="streamEia" type="checkbox" checked="" class="h-5 w-5 rounded border-2 border-border-color text-primary focus:border-border-color focus:ring-0"/>
+          <span class="text-sm text-text-main">EIA Short-Term Outlook</span>
+        </label>
+        <label class="-mx-2 flex cursor-pointer items-center gap-3 rounded px-2 py-3 transition-colors hover:bg-background-light">
+          <input id="streamOwid" type="checkbox" checked="" class="h-5 w-5 rounded border-2 border-border-color text-primary focus:border-border-color focus:ring-0"/>
+          <span class="text-sm text-text-main">OWID Historical Average</span>
+        </label>
+        <label class="-mx-2 mb-2 flex cursor-pointer items-center gap-3 border-b border-border-color px-2 py-3 pb-6 transition-colors hover:bg-background-light">
+          <input id="streamBand" type="checkbox" checked="" class="h-5 w-5 rounded border-2 border-border-color text-primary focus:border-border-color focus:ring-0"/>
+          <span class="text-sm text-text-main">Volatility Overlay</span>
+        </label>
+      </div>
+
+      <div class="mt-4 rounded-sm border border-border-color bg-background-light p-3 text-xs text-muted">
+        <p id="streamStatusText">Live synthesis active for all configured streams.</p>
+      </div>
+
+      <div class="mt-4">
+        <h3 class="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Confidence Intervals</h3>
+        <label class="flex items-center justify-between py-2 text-sm">
+          <span>95% (+/-2 sigma)</span>
+          <span class="h-4 w-8 rounded-sm border border-primary/40 bg-primary/20"></span>
+        </label>
+        <label class="flex items-center justify-between py-2 text-sm">
+          <span>68% (+/-1 sigma)</span>
+          <span class="h-4 w-8 rounded-sm border border-primary/60 bg-primary/40"></span>
+        </label>
+      </div>
+    </aside>
+
+    <section class="panel flex min-h-[520px] flex-col p-6 lg:col-span-6">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-display text-xl font-bold text-text-main">Price Forecasting and Deviation</h2>
+        <div id="rangeTabs" class="flex rounded border border-border-color bg-background-light p-1">
+          <button data-range="1M" class="range-button">1M</button>
+          <button data-range="3M" class="range-button">3M</button>
+          <button data-range="6M" class="range-button active">6M</button>
+          <button data-range="1Y" class="range-button">1Y</button>
+        </div>
+      </div>
+
+      <div id="chartCanvas" class="relative flex flex-1 items-center justify-center overflow-hidden rounded border border-border-color bg-background-light">
+        <svg class="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path id="bandPath" d="" fill="#0E7490" fill-opacity="0.1"></path>
+          <path id="mainPath" d="" fill="none" stroke="#0E7490" stroke-width="0.8"></path>
+          <path id="owidPath" d="" fill="none" stroke="#6B7280" stroke-dasharray="1.5 1.5" stroke-width="0.7"></path>
+        </svg>
+
+        <div id="yAxisLabels" class="absolute bottom-6 left-2 top-2 flex flex-col justify-between border-r border-border-color pr-2 text-right font-mono text-xs text-muted">
+          <span>$120</span>
+          <span>$100</span>
+          <span>$80</span>
+          <span>$60</span>
+        </div>
+
+        <div id="xAxisLabels" class="absolute bottom-2 left-10 right-4 flex justify-between font-mono text-xs text-muted">
+          <span>Jan</span>
+          <span>Feb</span>
+          <span>Mar</span>
+          <span>Apr</span>
+          <span>May</span>
+          <span>Jun</span>
+        </div>
+
+        <div id="hoverLayer" class="pointer-events-none absolute inset-0 hidden">
+          <div id="hoverLine" class="absolute bottom-8 top-4 w-px bg-primary"></div>
+          <div id="hoverDot" class="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-white"></div>
+          <div id="hoverTooltip" class="absolute -translate-x-1/2 rounded bg-text-main px-2 py-1 font-mono text-xs text-white"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel p-6 lg:col-span-3">
+      <h2 class="font-display text-xl font-bold tracking-tight text-text-main">Probability Statistics</h2>
+
+      <div class="mb-8 mt-6">
+        <h3 class="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Key Indicators</h3>
+        <div class="flex items-center justify-between border-b border-border-color py-3 text-sm">
+          <span>Current Spot Price</span>
+          <span id="spotPriceValue" class="font-mono font-medium">$82.45</span>
+        </div>
+        <div class="flex items-center justify-between border-b border-border-color py-3 text-sm">
+          <span>30-Day Moving Avg</span>
+          <span id="movingAvgValue" class="font-mono font-medium">$79.10</span>
+        </div>
+        <div class="flex items-center justify-between border-b border-border-color py-3 text-sm">
+          <span>Max Proj. Deviation</span>
+          <span id="maxDeviationValue" class="font-mono font-medium text-accent-danger">+14.2%</span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Probability Matrix (30 Days)</h3>
+        <div class="overflow-hidden rounded border border-border-color">
+          <table class="w-full text-left text-sm">
+            <thead class="border-b border-border-color bg-background-light">
+              <tr>
+                <th class="px-4 py-2 font-medium text-muted">Target Price</th>
+                <th class="px-4 py-2 text-right font-medium text-muted">Likelihood</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-color font-mono">
+              <tr>
+                <td class="px-4 py-2">&gt; $90.00</td>
+                <td id="probAbove90" class="px-4 py-2 text-right text-accent-danger">18%</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2">&gt; $85.00</td>
+                <td id="probAbove85" class="px-4 py-2 text-right">42%</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2">&lt; $80.00</td>
+                <td id="probBelow80" class="px-4 py-2 text-right">35%</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2">&lt; $75.00</td>
+                <td id="probBelow75" class="px-4 py-2 text-right text-accent-success">5%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    (function () {
+      const rangeToDays = {
+        "1M": 30,
+        "3M": 90,
+        "6M": 180,
+        "1Y": 365
+      };
+
+      const state = {
+        range: "6M",
+        showEia: true,
+        showOwid: true,
+        showBand: true,
+        points: [],
+        minY: 60,
+        maxY: 120
+      };
+
+      const ui = {
+        streamEia: document.getElementById("streamEia"),
+        streamOwid: document.getElementById("streamOwid"),
+        streamBand: document.getElementById("streamBand"),
+        streamStatusText: document.getElementById("streamStatusText"),
+        rangeButtons: Array.from(document.querySelectorAll("#rangeTabs button[data-range]")),
+        bandPath: document.getElementById("bandPath"),
+        mainPath: document.getElementById("mainPath"),
+        owidPath: document.getElementById("owidPath"),
+        chartCanvas: document.getElementById("chartCanvas"),
+        yAxisLabels: document.getElementById("yAxisLabels"),
+        xAxisLabels: document.getElementById("xAxisLabels"),
+        hoverLayer: document.getElementById("hoverLayer"),
+        hoverLine: document.getElementById("hoverLine"),
+        hoverDot: document.getElementById("hoverDot"),
+        hoverTooltip: document.getElementById("hoverTooltip"),
+        spotPriceValue: document.getElementById("spotPriceValue"),
+        movingAvgValue: document.getElementById("movingAvgValue"),
+        maxDeviationValue: document.getElementById("maxDeviationValue"),
+        probAbove90: document.getElementById("probAbove90"),
+        probAbove85: document.getElementById("probAbove85"),
+        probBelow80: document.getElementById("probBelow80"),
+        probBelow75: document.getElementById("probBelow75")
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function formatMoney(value) {
+        return "$" + value.toFixed(2);
+      }
+
+      function average(values) {
+        if (values.length === 0) {
+          return 0;
+        }
+        let sum = 0;
+        for (let i = 0; i < values.length; i += 1) {
+          sum += values[i];
+        }
+        return sum / values.length;
+      }
+
+      function erf(value) {
+        const sign = value >= 0 ? 1 : -1;
+        const x = Math.abs(value);
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+        const t = 1 / (1 + p * x);
+        const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+        return sign * y;
+      }
+
+      function normalCdf(x) {
+        return 0.5 * (1 + erf(x / Math.sqrt(2)));
+      }
+
+      function formatDateLabel(date, isShortWindow) {
+        const month = date.toLocaleString("en-US", { month: "short" });
+        if (isShortWindow) {
+          return month + " " + date.getDate();
+        }
+        return month;
+      }
+
+      function getTicks(values, count) {
+        const ticks = [];
+        if (values.length === 0) {
+          return ticks;
+        }
+        for (let i = 0; i < count; i += 1) {
+          const index = Math.round((i / (count - 1)) * (values.length - 1));
+          ticks.push(values[index]);
+        }
+        return ticks;
+      }
+
+      function buildSeries(days) {
+        const points = [];
+        const now = new Date();
+        for (let i = 0; i < days; i += 1) {
+          const progress = i / Math.max(days - 1, 1);
+          const drift = progress * (days >= 180 ? 7.8 : 5.2);
+          const cyclical = Math.sin(i / 8) * 2.6 + Math.cos(i / 20) * 1.1;
+          const micro = Math.sin(i * 0.37) * 0.65;
+          const sigma = 1.6 + Math.abs(Math.sin(i / 11)) * 1.4;
+          const eia = 76.5 + drift + cyclical + micro;
+          const owid = 75.2 + drift * 0.84 + Math.sin((i + 9) / 10) * 2.1 + Math.cos(i / 18) * 0.9;
+
+          const date = new Date(now);
+          date.setDate(now.getDate() - (days - i - 1));
+          points.push({
+            date: date,
+            eia: eia,
+            owid: owid,
+            upper: eia + sigma * 1.25,
+            lower: eia - sigma * 1.25,
+            sigma: sigma
+          });
+        }
+        return points;
+      }
+
+      function createPath(values, toY) {
+        if (values.length === 0) {
+          return "";
+        }
+        let path = "";
+        for (let i = 0; i < values.length; i += 1) {
+          const x = (i / Math.max(values.length - 1, 1)) * 100;
+          const y = toY(values[i]);
+          path += (i === 0 ? "M " : " L ") + x.toFixed(3) + " " + y.toFixed(3);
+        }
+        return path;
+      }
+
+      function createBandPath(upperValues, lowerValues, toY) {
+        if (upperValues.length === 0) {
+          return "";
+        }
+        let path = "";
+        for (let i = 0; i < upperValues.length; i += 1) {
+          const x = (i / Math.max(upperValues.length - 1, 1)) * 100;
+          path += (i === 0 ? "M " : " L ") + x.toFixed(3) + " " + toY(upperValues[i]).toFixed(3);
+        }
+        for (let i = lowerValues.length - 1; i >= 0; i -= 1) {
+          const x = (i / Math.max(lowerValues.length - 1, 1)) * 100;
+          path += " L " + x.toFixed(3) + " " + toY(lowerValues[i]).toFixed(3);
+        }
+        return path + " Z";
+      }
+
+      function updateStatusText() {
+        const activeStreams = [];
+        if (state.showEia) {
+          activeStreams.push("EIA");
+        }
+        if (state.showOwid) {
+          activeStreams.push("OWID");
+        }
+        if (state.showBand) {
+          activeStreams.push("Volatility");
+        }
+        if (activeStreams.length === 0) {
+          ui.streamStatusText.textContent = "No data stream selected. Enable at least one stream to render analytics.";
+          return;
+        }
+        ui.streamStatusText.textContent = "Active streams: " + activeStreams.join(", ") + ".";
+      }
+
+      function updateStats() {
+        const primarySeries = state.points.map(function (point) {
+          if (state.showEia) {
+            return point.eia;
+          }
+          if (state.showOwid) {
+            return point.owid;
+          }
+          return point.eia;
+        });
+
+        const latest = primarySeries[primarySeries.length - 1];
+        const movingWindow = primarySeries.slice(Math.max(0, primarySeries.length - 30));
+        const movingAverage = average(movingWindow);
+
+        let maxDeviation = 0;
+        for (let i = 0; i < primarySeries.length; i += 1) {
+          maxDeviation = Math.max(maxDeviation, Math.abs(primarySeries[i] - movingAverage));
+        }
+        const deviationPercent = movingAverage === 0 ? 0 : (maxDeviation / movingAverage) * 100;
+
+        ui.spotPriceValue.textContent = formatMoney(latest);
+        ui.movingAvgValue.textContent = formatMoney(movingAverage);
+        ui.maxDeviationValue.textContent = (deviationPercent >= 0 ? "+" : "") + deviationPercent.toFixed(1) + "%";
+
+        const sigma = Math.max(0.8, average(state.points.map(function (point) { return point.sigma; })) * 1.7);
+        function probabilityAbove(target) {
+          const z = (target - latest) / sigma;
+          return (1 - normalCdf(z)) * 100;
+        }
+        function probabilityBelow(target) {
+          const z = (target - latest) / sigma;
+          return normalCdf(z) * 100;
+        }
+
+        ui.probAbove90.textContent = Math.round(probabilityAbove(90)) + "%";
+        ui.probAbove85.textContent = Math.round(probabilityAbove(85)) + "%";
+        ui.probBelow80.textContent = Math.round(probabilityBelow(80)) + "%";
+        ui.probBelow75.textContent = Math.round(probabilityBelow(75)) + "%";
+      }
+
+      function renderChart() {
+        const valuesForBounds = [];
+        for (let i = 0; i < state.points.length; i += 1) {
+          const point = state.points[i];
+          if (state.showEia) {
+            valuesForBounds.push(point.eia);
+          }
+          if (state.showOwid) {
+            valuesForBounds.push(point.owid);
+          }
+          if (state.showBand) {
+            valuesForBounds.push(point.upper);
+            valuesForBounds.push(point.lower);
+          }
+        }
+
+        if (valuesForBounds.length === 0) {
+          for (let i = 0; i < state.points.length; i += 1) {
+            valuesForBounds.push(state.points[i].eia);
+          }
+        }
+
+        const minValue = Math.min.apply(null, valuesForBounds);
+        const maxValue = Math.max.apply(null, valuesForBounds);
+        const paddedMin = Math.floor((minValue - 2) / 5) * 5;
+        const paddedMax = Math.ceil((maxValue + 2) / 5) * 5;
+
+        state.minY = paddedMin;
+        state.maxY = paddedMax;
+
+        const span = Math.max(state.maxY - state.minY, 1);
+        function toY(value) {
+          return ((state.maxY - value) / span) * 100;
+        }
+
+        const eiaValues = state.points.map(function (point) { return point.eia; });
+        const owidValues = state.points.map(function (point) { return point.owid; });
+        const upperValues = state.points.map(function (point) { return point.upper; });
+        const lowerValues = state.points.map(function (point) { return point.lower; });
+
+        ui.mainPath.setAttribute("d", createPath(eiaValues, toY));
+        ui.owidPath.setAttribute("d", createPath(owidValues, toY));
+        ui.bandPath.setAttribute("d", createBandPath(upperValues, lowerValues, toY));
+
+        ui.mainPath.style.opacity = state.showEia ? "1" : "0";
+        ui.owidPath.style.opacity = state.showOwid ? "1" : "0";
+        ui.bandPath.style.opacity = state.showBand ? "1" : "0";
+
+        const yTicks = [state.maxY, state.maxY - span / 3, state.maxY - (span / 3) * 2, state.minY];
+        const yTickNodes = ui.yAxisLabels.querySelectorAll("span");
+        for (let i = 0; i < yTickNodes.length; i += 1) {
+          yTickNodes[i].textContent = "$" + yTicks[i].toFixed(0);
+        }
+
+        const dayCount = rangeToDays[state.range];
+        const xTickDates = getTicks(state.points.map(function (point) { return point.date; }), 6);
+        const xTickNodes = ui.xAxisLabels.querySelectorAll("span");
+        for (let i = 0; i < xTickNodes.length; i += 1) {
+          xTickNodes[i].textContent = formatDateLabel(xTickDates[i], dayCount <= 90);
+        }
+
+        updateStats();
+        updateStatusText();
+      }
+
+      function updateHover(event) {
+        if (state.points.length === 0) {
+          return;
+        }
+
+        const rect = ui.chartCanvas.getBoundingClientRect();
+        const xRatio = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+        const pointIndex = Math.round(xRatio * (state.points.length - 1));
+        const point = state.points[pointIndex];
+
+        const primary = state.showEia ? point.eia : (state.showOwid ? point.owid : point.eia);
+        const yRatio = (state.maxY - primary) / Math.max(state.maxY - state.minY, 1);
+        const yPixels = yRatio * rect.height;
+
+        const leftPx = xRatio * rect.width;
+        ui.hoverLine.style.left = leftPx.toFixed(1) + "px";
+        ui.hoverDot.style.left = leftPx.toFixed(1) + "px";
+        ui.hoverDot.style.top = yPixels.toFixed(1) + "px";
+        ui.hoverTooltip.style.left = clamp(leftPx, 72, rect.width - 72).toFixed(1) + "px";
+        ui.hoverTooltip.style.top = clamp(yPixels - 34, 8, rect.height - 26).toFixed(1) + "px";
+        ui.hoverTooltip.textContent = formatDateLabel(point.date, true) + ": " + formatMoney(primary);
+      }
+
+      function setRange(newRange) {
+        state.range = newRange;
+        state.points = buildSeries(rangeToDays[newRange]);
+        renderChart();
+
+        for (let i = 0; i < ui.rangeButtons.length; i += 1) {
+          const button = ui.rangeButtons[i];
+          button.classList.toggle("active", button.dataset.range === newRange);
+        }
+      }
+
+      ui.rangeButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          setRange(button.dataset.range);
+        });
+      });
+
+      ui.streamEia.addEventListener("change", function () {
+        state.showEia = ui.streamEia.checked;
+        renderChart();
+      });
+
+      ui.streamOwid.addEventListener("change", function () {
+        state.showOwid = ui.streamOwid.checked;
+        renderChart();
+      });
+
+      ui.streamBand.addEventListener("change", function () {
+        state.showBand = ui.streamBand.checked;
+        renderChart();
+      });
+
+      ui.chartCanvas.addEventListener("mouseenter", function () {
+        ui.hoverLayer.classList.remove("hidden");
+      });
+
+      ui.chartCanvas.addEventListener("mouseleave", function () {
+        ui.hoverLayer.classList.add("hidden");
+      });
+
+      ui.chartCanvas.addEventListener("mousemove", updateHover);
+
+      setRange(state.range);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Opti Reserve - Monte Carlo Simulator</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&family=Space+Grotesk:wght@500;600;700&display=swap"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0E7490",
+            "background-light": "#F4F8F9",
+            "surface": "#FFFFFF",
+            "text-main": "#111827",
+            "muted": "#6B7280",
+            "border-color": "#E5E7EB",
+            "accent-success": "#059669",
+            "accent-danger": "#DC2626"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"],
+            "body": ["IBM Plex Sans", "sans-serif"],
+            "mono": ["IBM Plex Mono", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "2px",
+            "sm": "2px",
+            "md": "2px",
+            "lg": "2px",
+            "full": "9999px"
+          },
+          spacing: {
+            "sm": "8px",
+            "md": "16px",
+            "lg": "24px"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: radial-gradient(circle at 8% 0%, rgba(14, 116, 144, 0.09), transparent 34%), radial-gradient(circle at 88% 14%, rgba(14, 116, 144, 0.06), transparent 36%), #F4F8F9;
+      color: #111827;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .page-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 16px 36px;
+    }
+
+    @media (min-width: 768px) {
+      .page-shell {
+        padding: 28px 40px 40px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .page-shell {
+        padding: 32px 64px 44px;
+      }
+    }
+
+    .panel {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .top-nav-link {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 2px;
+      border-bottom: 2px solid transparent;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .top-nav-link:hover {
+      color: #0E7490;
+    }
+
+    .top-nav-link.active {
+      color: #0E7490;
+      border-bottom-color: #0E7490;
+    }
+
+    input[type="range"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      background: #0E7490;
+      cursor: pointer;
+      margin-top: -5px;
+      box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 3px #0E7490;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 2px;
+      cursor: pointer;
+      background: #E5E7EB;
+      border-radius: 1px;
+    }
+
+    input[type="range"]:focus {
+      outline: none;
+    }
+
+    .chart-bar {
+      background-color: #0E7490;
+      width: 100%;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.25s ease;
+    }
+
+    .ci-line {
+      border-left: 1px dashed #6B7280;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased text-text-main">
+  <header class="border-b border-border-color bg-white/90 backdrop-blur-sm">
+    <div class="mx-auto flex w-full max-w-[1440px] flex-col px-4 md:px-10 lg:px-16">
+      <div class="flex h-[76px] items-center justify-between gap-6">
+        <div class="flex items-center gap-3 text-text-main">
+          <div class="size-5 text-primary">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <h1 class="font-display text-lg font-bold tracking-tight">Opti Reserve</h1>
+        </div>
+        <nav class="hidden items-center gap-7 md:flex">
+          <a class="top-nav-link" href="../executive_overview/code.html">Executive Overview</a>
+          <a class="top-nav-link" href="../global_price_analytics/code.html">Global Analytics</a>
+          <a class="top-nav-link" href="../domestic_supply_thailand/code.html">Domestic Supply</a>
+          <a class="top-nav-link active" href="code.html">Simulator</a>
+        </nav>
+      </div>
+      <nav class="flex items-center gap-5 overflow-x-auto pb-3 md:hidden">
+        <a class="top-nav-link" href="../executive_overview/code.html">Executive</a>
+        <a class="top-nav-link" href="../global_price_analytics/code.html">Global</a>
+        <a class="top-nav-link" href="../domestic_supply_thailand/code.html">Domestic</a>
+        <a class="top-nav-link active" href="code.html">Simulator</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <aside class="panel flex h-full flex-col gap-8 p-lg lg:col-span-4">
+        <div class="border-b border-border-color pb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl text-primary">tune</span>
+            <h2 class="font-display text-lg font-semibold text-text-main">Simulation Parameters</h2>
+          </div>
+        </div>
+
+        <div class="flex flex-grow flex-col gap-8">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-end justify-between">
+              <label for="volatilityInput" class="text-sm font-medium text-text-main">Global Volatility Index</label>
+              <span id="volatilityValue" class="font-mono text-sm font-medium text-primary">18.5%</span>
+            </div>
+            <div class="relative pt-2">
+              <input id="volatilityInput" type="range" min="0" max="100" step="0.1" value="18.5" class="w-full"/>
+              <div id="volatilityFill" class="absolute left-0 top-[11px] h-0.5 rounded-l-sm bg-primary" style="width: 18.5%;"></div>
+            </div>
+            <div class="flex justify-between font-mono text-xs text-muted">
+              <span>5% (Low)</span>
+              <span>50% (High)</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <div class="flex items-end justify-between">
+              <label for="demandInput" class="text-sm font-medium text-text-main">Thai Demand Surge</label>
+              <span id="demandValue" class="font-mono text-sm font-medium text-primary">+4.2%</span>
+            </div>
+            <div class="relative pt-2">
+              <input id="demandInput" type="range" min="-10" max="20" step="0.1" value="4.2" class="w-full"/>
+              <div id="demandFill" class="absolute left-0 top-[11px] h-0.5 rounded-l-sm bg-primary" style="width: 47%;"></div>
+            </div>
+            <div class="flex justify-between font-mono text-xs text-muted">
+              <span>-10%</span>
+              <span>+20%</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <div class="flex items-end justify-between">
+              <label for="riskInput" class="text-sm font-medium text-text-main">Geopolitical Risk Premium</label>
+              <span id="riskValue" class="font-mono text-sm font-medium text-primary">$12.00</span>
+            </div>
+            <div class="relative pt-2">
+              <input id="riskInput" type="range" min="0" max="50" step="0.1" value="12" class="w-full"/>
+              <div id="riskFill" class="absolute left-0 top-[11px] h-0.5 rounded-l-sm bg-primary" style="width: 24%;"></div>
+            </div>
+            <div class="flex justify-between font-mono text-xs text-muted">
+              <span>$0</span>
+              <span>$50</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-auto border-t border-border-color pt-6">
+          <button id="runSimulationButton" class="flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 font-display text-[13px] font-medium uppercase tracking-[0.05em] text-surface transition-colors hover:bg-[#0A5E74] disabled:cursor-wait disabled:opacity-75">
+            <span class="material-symbols-outlined text-sm">play_arrow</span>
+            <span>Execute Full Run</span>
+          </button>
+          <p id="runMeta" class="mt-3 text-center font-mono text-xs text-muted">10,000 iterations | Est. time: 2.4s</p>
+        </div>
+      </aside>
+
+      <section class="panel flex flex-col gap-6 p-lg lg:col-span-8">
+        <div class="grid grid-cols-1 gap-px overflow-hidden rounded-sm border border-border-color bg-border-color md:grid-cols-2">
+          <div class="relative flex flex-col gap-2 bg-surface p-6">
+            <div class="absolute right-0 top-0 h-16 w-16 rounded-bl-full bg-primary opacity-5"></div>
+            <h3 class="text-sm font-medium uppercase tracking-wider text-muted">Optimal Strategy</h3>
+            <p id="strategyValue" class="font-display text-2xl font-bold text-text-main">Buy 2.4M bbl</p>
+            <p class="mt-1 flex items-center gap-1 text-xs text-muted">
+              <span class="material-symbols-outlined text-xs text-accent-success">check_circle</span>
+              <span id="strategyNote">Minimizes expected cost over 90 days</span>
+            </p>
+          </div>
+          <div class="flex flex-col gap-2 bg-surface p-6">
+            <h3 class="text-sm font-medium uppercase tracking-wider text-muted">Expected Value (EV) Cost</h3>
+            <p id="evCostValue" class="font-mono text-2xl font-medium text-text-main">$184.3M</p>
+            <p class="mt-1 flex items-center gap-1 text-xs text-muted">
+              <span class="material-symbols-outlined text-xs">info</span>
+              <span id="evCiText">95% CI: $172M - $198M</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="relative mt-2 flex flex-grow flex-col overflow-hidden rounded-sm border border-border-color">
+          <div class="flex items-center justify-between border-b border-border-color bg-background-light p-4">
+            <h3 class="font-display font-semibold text-text-main">10,000-Run Probability Distribution</h3>
+            <div class="flex gap-4">
+              <div class="flex items-center gap-2">
+                <div class="h-3 w-3 rounded-sm bg-primary"></div>
+                <span class="text-xs text-muted">Frequency</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-4 border-t border-dashed border-muted"></div>
+                <span class="text-xs text-muted">95% CI</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative flex min-h-[320px] flex-grow flex-col p-6">
+            <div class="absolute bottom-10 left-6 top-6 flex w-12 flex-col justify-between border-r border-border-color pr-2 text-right font-mono text-xs text-muted">
+              <span id="yTickMax">800</span>
+              <span id="yTickQ3">600</span>
+              <span id="yTickMid">400</span>
+              <span id="yTickQ1">200</span>
+              <span id="yTickMin">0</span>
+            </div>
+
+            <div id="histogramArea" class="relative ml-12 flex flex-grow items-end border-b border-border-color pb-1">
+              <div id="ciLowLine" class="ci-line left-[20%]">
+                <div id="ciLowLabel" class="absolute -left-6 -top-5 font-mono text-xs text-muted">$172M</div>
+              </div>
+              <div id="ciHighLine" class="ci-line left-[80%]">
+                <div id="ciHighLabel" class="absolute -left-6 -top-5 font-mono text-xs text-muted">$198M</div>
+              </div>
+              <div id="meanLine" class="pointer-events-none absolute left-1/2 top-0 h-full border-l border-primary">
+                <div id="meanLineLabel" class="absolute -left-8 -top-6 font-mono text-xs font-bold text-text-main">Mean</div>
+              </div>
+              <div id="histogramBars" class="flex h-full w-full items-end gap-[2px]"></div>
+            </div>
+
+            <div class="ml-12 mt-2 flex h-6 justify-between px-2 font-mono text-xs text-muted">
+              <span id="xMinLabel">$160M</span>
+              <span id="xQ1Label">$175M</span>
+              <span id="xMeanLabel" class="font-bold text-text-main">$184.3M</span>
+              <span id="xQ3Label">$195M</span>
+              <span id="xMaxLabel">$210M</span>
+            </div>
+            <div class="mt-2 text-center text-xs font-medium uppercase tracking-wider text-muted">Total Projected Cost (USD)</div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const ITERATIONS = 10000;
+      const STRATEGIES = [0, 1.2, 2.4, 3.6, 4.8];
+      const BASE_PRICE = 74.5;
+      const BASE_BURN_RATE = 1.2;
+      const CURRENT_RESERVE = 45;
+      const HORIZON_DAYS = 90;
+      const MANDATE_DAYS = 90;
+
+      const controls = {
+        volatilityInput: document.getElementById("volatilityInput"),
+        demandInput: document.getElementById("demandInput"),
+        riskInput: document.getElementById("riskInput"),
+        volatilityValue: document.getElementById("volatilityValue"),
+        demandValue: document.getElementById("demandValue"),
+        riskValue: document.getElementById("riskValue"),
+        volatilityFill: document.getElementById("volatilityFill"),
+        demandFill: document.getElementById("demandFill"),
+        riskFill: document.getElementById("riskFill"),
+        runSimulationButton: document.getElementById("runSimulationButton"),
+        runMeta: document.getElementById("runMeta"),
+        strategyValue: document.getElementById("strategyValue"),
+        strategyNote: document.getElementById("strategyNote"),
+        evCostValue: document.getElementById("evCostValue"),
+        evCiText: document.getElementById("evCiText"),
+        histogramBars: document.getElementById("histogramBars"),
+        ciLowLine: document.getElementById("ciLowLine"),
+        ciHighLine: document.getElementById("ciHighLine"),
+        ciLowLabel: document.getElementById("ciLowLabel"),
+        ciHighLabel: document.getElementById("ciHighLabel"),
+        meanLine: document.getElementById("meanLine"),
+        meanLineLabel: document.getElementById("meanLineLabel"),
+        xMinLabel: document.getElementById("xMinLabel"),
+        xQ1Label: document.getElementById("xQ1Label"),
+        xMeanLabel: document.getElementById("xMeanLabel"),
+        xQ3Label: document.getElementById("xQ3Label"),
+        xMaxLabel: document.getElementById("xMaxLabel"),
+        yTickMax: document.getElementById("yTickMax"),
+        yTickQ3: document.getElementById("yTickQ3"),
+        yTickMid: document.getElementById("yTickMid"),
+        yTickQ1: document.getElementById("yTickQ1"),
+        yTickMin: document.getElementById("yTickMin")
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function formatMoneyMillions(value) {
+        return "$" + value.toFixed(1) + "M";
+      }
+
+      function randomNormal() {
+        let u = 0;
+        let v = 0;
+        while (u === 0) {
+          u = Math.random();
+        }
+        while (v === 0) {
+          v = Math.random();
+        }
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      function quantile(sortedValues, q) {
+        const position = (sortedValues.length - 1) * q;
+        const base = Math.floor(position);
+        const rest = position - base;
+        const next = sortedValues[base + 1];
+        if (next !== undefined) {
+          return sortedValues[base] + rest * (next - sortedValues[base]);
+        }
+        return sortedValues[base];
+      }
+
+      function getNumericParam(name, fallbackValue, min, max) {
+        const search = new URLSearchParams(window.location.search);
+        const rawValue = Number(search.get(name));
+        if (Number.isFinite(rawValue)) {
+          return clamp(rawValue, min, max);
+        }
+        return fallbackValue;
+      }
+
+      function updateSliderDisplay(input, valueNode, fillNode, formatter) {
+        const value = Number(input.value);
+        const min = Number(input.min);
+        const max = Number(input.max);
+        const percent = ((value - min) / (max - min)) * 100;
+        valueNode.textContent = formatter(value);
+        fillNode.style.width = percent.toFixed(2) + "%";
+      }
+
+      function ensureHistogramBars(count) {
+        if (controls.histogramBars.children.length === count) {
+          return;
+        }
+        controls.histogramBars.innerHTML = "";
+        for (let index = 0; index < count; index += 1) {
+          const bar = document.createElement("div");
+          bar.className = "chart-bar flex-1";
+          controls.histogramBars.appendChild(bar);
+        }
+      }
+
+      function runMonteCarloSimulation(parameters) {
+        const volatilityScale = 0.05 + (parameters.volatility / 100) * 0.35;
+        const demandShift = parameters.demand / 100;
+        const riskPremium = parameters.risk;
+        const strategyOutcomes = STRATEGIES.map(() => []);
+
+        for (let iteration = 0; iteration < ITERATIONS; iteration += 1) {
+          const horizonShock = randomNormal() * volatilityScale;
+          const demandNoise = randomNormal() * volatilityScale * 0.18;
+          const demandMultiplier = Math.max(0.75, 1 + demandShift + demandNoise);
+          const horizonPrice = Math.max(35, BASE_PRICE * (1 + horizonShock) + riskPremium * 0.45);
+          const projectedDrawdown = BASE_BURN_RATE * HORIZON_DAYS * demandMultiplier;
+          const mandateTarget = BASE_BURN_RATE * MANDATE_DAYS;
+
+          for (let strategyIndex = 0; strategyIndex < STRATEGIES.length; strategyIndex += 1) {
+            const buyVolume = STRATEGIES[strategyIndex];
+            const reserveAfterBuy = CURRENT_RESERVE + buyVolume;
+            const shortfallVolume = Math.max(projectedDrawdown - reserveAfterBuy, 0);
+            const mandateGap = Math.max(mandateTarget - reserveAfterBuy, 0);
+
+            const immediateBuyCost = buyVolume * BASE_PRICE;
+            const shortfallRefillCost = shortfallVolume * horizonPrice;
+            const storageCost = buyVolume * 0.35;
+            const mandatePenalty = mandateGap * (4 + parameters.volatility * 0.08 + riskPremium * 0.1);
+
+            strategyOutcomes[strategyIndex].push(immediateBuyCost + shortfallRefillCost + storageCost + mandatePenalty);
+          }
+        }
+
+        const strategyMeans = strategyOutcomes.map(function (costs) {
+          let sum = 0;
+          for (let i = 0; i < costs.length; i += 1) {
+            sum += costs[i];
+          }
+          return sum / costs.length;
+        });
+
+        let bestStrategyIndex = 0;
+        for (let i = 1; i < strategyMeans.length; i += 1) {
+          if (strategyMeans[i] < strategyMeans[bestStrategyIndex]) {
+            bestStrategyIndex = i;
+          }
+        }
+
+        const bestCosts = strategyOutcomes[bestStrategyIndex].slice().sort(function (a, b) {
+          return a - b;
+        });
+
+        const mean = strategyMeans[bestStrategyIndex];
+        const ciLow = quantile(bestCosts, 0.025);
+        const ciHigh = quantile(bestCosts, 0.975);
+        const q1 = quantile(bestCosts, 0.25);
+        const q3 = quantile(bestCosts, 0.75);
+        const min = bestCosts[0];
+        const max = bestCosts[bestCosts.length - 1];
+
+        const binCount = 20;
+        const span = Math.max(max - min, 1);
+        const histogramCounts = new Array(binCount).fill(0);
+        for (let i = 0; i < bestCosts.length; i += 1) {
+          const normalized = (bestCosts[i] - min) / span;
+          const index = Math.min(binCount - 1, Math.floor(normalized * binCount));
+          histogramCounts[index] += 1;
+        }
+
+        let maxHistogramCount = 0;
+        for (let i = 0; i < histogramCounts.length; i += 1) {
+          if (histogramCounts[i] > maxHistogramCount) {
+            maxHistogramCount = histogramCounts[i];
+          }
+        }
+
+        return {
+          chosenVolume: STRATEGIES[bestStrategyIndex],
+          mean: mean,
+          ciLow: ciLow,
+          ciHigh: ciHigh,
+          q1: q1,
+          q3: q3,
+          min: min,
+          max: max,
+          counts: histogramCounts,
+          maxCount: maxHistogramCount,
+          coverageDays: (CURRENT_RESERVE + STRATEGIES[bestStrategyIndex]) / (BASE_BURN_RATE * (1 + demandShift))
+        };
+      }
+
+      function renderSimulationResult(result) {
+        const chosenAction = result.chosenVolume < 0.1 ? "Hold" : "Buy " + result.chosenVolume.toFixed(1) + "M bbl";
+        controls.strategyValue.textContent = chosenAction;
+        controls.strategyNote.textContent = "Projected " + Math.round(result.coverageDays) + "-day cover with active assumptions";
+        controls.evCostValue.textContent = formatMoneyMillions(result.mean);
+        controls.evCiText.textContent = "95% CI: " + formatMoneyMillions(result.ciLow) + " - " + formatMoneyMillions(result.ciHigh);
+
+        controls.xMinLabel.textContent = formatMoneyMillions(result.min);
+        controls.xQ1Label.textContent = formatMoneyMillions(result.q1);
+        controls.xMeanLabel.textContent = formatMoneyMillions(result.mean);
+        controls.xQ3Label.textContent = formatMoneyMillions(result.q3);
+        controls.xMaxLabel.textContent = formatMoneyMillions(result.max);
+
+        controls.yTickMax.textContent = String(result.maxCount);
+        controls.yTickQ3.textContent = String(Math.round(result.maxCount * 0.75));
+        controls.yTickMid.textContent = String(Math.round(result.maxCount * 0.5));
+        controls.yTickQ1.textContent = String(Math.round(result.maxCount * 0.25));
+        controls.yTickMin.textContent = "0";
+
+        const span = Math.max(result.max - result.min, 1);
+        function toPercent(value) {
+          return clamp(((value - result.min) / span) * 100, 0, 100);
+        }
+
+        const ciLowPercent = toPercent(result.ciLow);
+        const ciHighPercent = toPercent(result.ciHigh);
+        const meanPercent = toPercent(result.mean);
+
+        controls.ciLowLine.style.left = ciLowPercent.toFixed(2) + "%";
+        controls.ciHighLine.style.left = ciHighPercent.toFixed(2) + "%";
+        controls.meanLine.style.left = meanPercent.toFixed(2) + "%";
+
+        controls.ciLowLabel.textContent = formatMoneyMillions(result.ciLow);
+        controls.ciHighLabel.textContent = formatMoneyMillions(result.ciHigh);
+        controls.meanLineLabel.textContent = "Mean " + formatMoneyMillions(result.mean);
+
+        ensureHistogramBars(result.counts.length);
+        const bars = controls.histogramBars.children;
+        for (let i = 0; i < bars.length; i += 1) {
+          const bar = bars[i];
+          const count = result.counts[i];
+          const height = result.maxCount === 0 ? 2 : Math.max((count / result.maxCount) * 100, 2);
+          const binStart = result.min + (i / result.counts.length) * span;
+          const binEnd = result.min + ((i + 1) / result.counts.length) * span;
+          bar.style.height = height.toFixed(2) + "%";
+          bar.style.opacity = i > 3 && i < 16 ? "0.75" : "1";
+          bar.title = formatMoneyMillions(binStart) + " to " + formatMoneyMillions(binEnd) + ": " + count + " runs";
+        }
+      }
+
+      function getCurrentParameters() {
+        return {
+          volatility: Number(controls.volatilityInput.value),
+          demand: Number(controls.demandInput.value),
+          risk: Number(controls.riskInput.value)
+        };
+      }
+
+      function updateParameterDisplay() {
+        updateSliderDisplay(controls.volatilityInput, controls.volatilityValue, controls.volatilityFill, function (value) {
+          return value.toFixed(1) + "%";
+        });
+        updateSliderDisplay(controls.demandInput, controls.demandValue, controls.demandFill, function (value) {
+          const prefix = value >= 0 ? "+" : "";
+          return prefix + value.toFixed(1) + "%";
+        });
+        updateSliderDisplay(controls.riskInput, controls.riskValue, controls.riskFill, function (value) {
+          return "$" + value.toFixed(2);
+        });
+      }
+
+      function runSimulation() {
+        controls.runSimulationButton.disabled = true;
+        controls.runMeta.textContent = "Running 10,000 iterations...";
+
+        window.requestAnimationFrame(function () {
+          const startedAt = performance.now();
+          const result = runMonteCarloSimulation(getCurrentParameters());
+          renderSimulationResult(result);
+          const elapsedSeconds = (performance.now() - startedAt) / 1000;
+          controls.runMeta.textContent = "10,000 iterations | Completed in " + elapsedSeconds.toFixed(2) + "s";
+          controls.runSimulationButton.disabled = false;
+        });
+      }
+
+      controls.volatilityInput.value = getNumericParam("volatility", 18.5, 0, 100).toFixed(1);
+      controls.demandInput.value = getNumericParam("demand", 4.2, -10, 20).toFixed(1);
+      controls.riskInput.value = getNumericParam("risk", 12, 0, 50).toFixed(1);
+
+      controls.volatilityInput.addEventListener("input", updateParameterDisplay);
+      controls.demandInput.addEventListener("input", updateParameterDisplay);
+      controls.riskInput.addEventListener("input", updateParameterDisplay);
+      controls.runSimulationButton.addEventListener("click", runSimulation);
+
+      updateParameterDisplay();
+      runSimulation();
+    })();
+  </script>
+</body>
+</html>
